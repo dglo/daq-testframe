@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+<testFrame>
+
+    <!-- =========================== -->
+    <!-- Configure global parameters -->
+    <!-- =========================== -->
+    <runNumber>12345</runNumber>
+
+    <!-- =========================== -->
+    <!-- Configure inice trigger     -->
+    <!-- =========================== -->
+    <iniceTrigger>
+        <!--  ================================================================ -->
+        <!-- this option enable or disable the component. By default the       -->
+        <!-- component is active (true). The options are (true, false)         -->
+        <!--  ================================================================ -->
+        <active>true</active>
+
+        <!--  =================================================================== -->
+        <!-- the name for the input source must be one of the following options:  -->
+        <!-- (stringHub, randGenerator, fileReader)                              -->
+        <!--  =================================================================== -->
+        <source>randGenerator</source>
+
+        <!--  ======================================================================== -->
+        <!-- the name for the output destintaion must be one of the following options: -->
+        <!-- (globalTrigger, disposerOutputDest, fileWriterChannel)                    -->
+        <!--  ======================================================================== -->
+        <dest>fileWriterChannel</dest>
+
+        <!--  ========================================= -->
+        <!-- configure the trigger based on a xml file  -->
+        <!--  ========================================= -->
+        <triggerConfig>iniceTrigger-2MinBias-config.xml</triggerConfig>
+
+        <!--  ======================================================== -->
+        <!-- make up the input source from a generator or a input file -->
+        <!--  ======================================================== -->
+        <inputSource>sbInputSource-config.xml</inputSource>
+
+        <!--  =============================================================== -->
+        <!-- make up the output destination which can be a disposer or a file -->
+        <!--  =============================================================== -->
+        <outputDests>outputDest-config.xml</outputDests>
+    </iniceTrigger>
+
+
+    <!-- =========================== -->
+    <!-- Configure secondaryBuilders -->
+    <!-- =========================== -->
+    <secondaryBuilders>
+
+        <!--  ================================================================ -->
+        <!--  this option enable or disable the component. By default the       -->
+        <!--  component is active (true). The options are (true, false)         -->
+        <!--  ================================================================ -->
+        <active>false</active>
+
+        <!--  ================================================================ -->
+        <!-- set the values for ByteBufferCache:                               -->
+        <!--  ================================================================ -->
+        <granularity>256</granularity>
+        <maxNumCachedBytes>30000000</maxNumCachedBytes>
+        <maxNumAcquiredBytes>30000000</maxNumAcquiredBytes>
+
+        <!--  ================================================================ -->
+        <!--  this option enable or disable the tcalBuilder. By default the     -->
+        <!--  component is active (true). The options are (true, false)         -->
+        <!--  ================================================================ -->
+        <isTcalEnabled>true</isTcalEnabled>
+
+        <!--  ================================================================ -->
+        <!-- this option enable or disable the snBuilder. By default the       -->
+        <!-- component is active (true). The options are (true, false)         -->
+        <!--  ================================================================ -->
+        <isSnEnabled>true</isSnEnabled>
+
+        <!--  ================================================================ -->
+        <!-- this option enable or disable the moniBuilder. By default the     -->
+        <!-- component is active (true). The options are (true, false)         -->
+        <!--  ================================================================ -->
+        <isMoniEnabled>true</isMoniEnabled>
+
+
+        <!--  ======================================================================================= -->
+        <!-- the name for the input source must be one of the following options:                      -->
+        <!-- (stringHub, randGenerator, fileReader)                                                   -->
+        <!--  ======================================================================================= -->
+        <source>randGenerator</source>
+
+        <!--  ======================================================== -->
+        <!-- make up the input source from a generator or a input file -->
+        <!--  ======================================================== -->
+        <inputSource>sbInputSource-config.xml</inputSource>
+
+        <!--  ======================================================================== -->
+        <!-- the name of the output file to write tcal data                            -->
+        <!--  ======================================================================== -->
+        <dest>sbData-output</dest>
+
+    </secondaryBuilders>
+
+    <eventBuilder>
+        <!--  ================================================================ -->
+        <!--  this option enable or disable the component. By default the       -->
+        <!--  component is active (true). The options are (true, false)         -->
+        <!--  ================================================================ -->
+        <active>false</active>
+
+        <!--  =================================================================== -->
+        <!-- the name for the input source must be one of the following options:  -->
+        <!-- (globalTrigger, randGenerator, fileReader)                           -->
+        <!--  =================================================================== -->
+        <frontEnd>randGenerator</frontEnd>
+
+        <!--  =========================================================================================== -->
+        <!-- the name for the input source must be one of the following options:                          -->
+        <!-- (stringHubs, fileReader, randGenerator)                                                      -->
+        <!--  =========================================================================================== -->
+        <backEnd>randGenerator</backEnd>
+
+        <!--  ======================================================== -->
+        <!-- make up the input source from a generator or a input file -->
+        <!--  ======================================================== -->
+        <ebInputSource>ebInputSource-config.xml</ebInputSource>
+
+        <!--  ======================================================================== -->
+        <!-- the name for the req output engine must be one of the following options:  -->
+        <!-- (stringHubs, fileWriterChannel, disposerOutputDest)                 -->
+        <!--  ======================================================================== -->
+        <reqOutputEng>fileWriterChannel</reqOutputEng>
+
+        <!--  ======================================================== -->
+        <!-- make up the req output destination                        -->
+        <!--  ======================================================== -->
+        <reqOutputDest>ebReqOutputDest-config.xml</reqOutputDest>
+
+        <!--  ========================================================================= -->
+        <!-- the name for the flush output engine must be one of the following options: -->
+        <!-- (stringHubs, disposerOutputDest, fileWriterChannel)                        -->
+        <!--  ========================================================================= -->
+        <flushOutputEng>fileWriterChannel</flushOutputEng>
+
+        <!--  ======================================================== -->
+        <!-- make up the flush output destination                      -->
+        <!--  ======================================================== -->
+        <flushOutputDest>ebFlushOutputDest-config.xml</flushOutputDest>
+
+
+    </eventBuilder>
+
+</testFrame>

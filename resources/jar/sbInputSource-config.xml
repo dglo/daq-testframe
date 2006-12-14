@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<inputSources>
+    <!-- ============================================================= -->
+    <!-- if procDuration is > 0 then totalHits value will not be used. -->
+    <!-- ============================================================= -->
+    <inputSourceGenerator>
+        <rate>0.0000001</rate>
+        <numDoms>60</numDoms>
+        <sourceId>4000</sourceId>
+        <triggerMode>2</triggerMode>
+        <payloadType>HitPayload</payloadType>
+        <procDuration>1</procDuration>
+        <totalHits>1000</totalHits>
+    </inputSourceGenerator>
+
+    <inputSourceFile>
+        <sourceId>2000</sourceId>
+        <fileName>gen-output-inice.dat</fileName>
+    </inputSourceFile>
+</inputSources>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<outputDests>
+    <disposerOutputDest>
+        <sourceId>6000</sourceId>
+    </disposerOutputDest>
+    <fileWriterChannel>
+        <sourceId>6000</sourceId>
+        <fileName>output_global.dat</fileName>
+    </fileWriterChannel>
+</outputDests>

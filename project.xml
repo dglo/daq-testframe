@@ -1,0 +1,35 @@
+<project>
+	<name>daq-testframe</name>
+	<packages default="icecube.daq.testframe">
+		icecube.daq.testframe
+	</packages>
+	<uses>
+		<libs>
+            payload.jar
+			daq-test-util.jar
+            daq-common.jar
+            splicer.jar
+            icebucket.jar
+            stringHub-prod.jar
+            trigger.jar
+            eventBuilder-prod.jar
+            secondaryBuilders.jar
+            payload-generator.jar
+            daq-io.jar
+        </libs>
+		<tools>
+			commons-logging-api.jar
+            log4j.jar
+            dom4j.jar
+            jaxb-api.jar
+            jaxb-impl.jar
+            jaxb-libs.jar
+            jaxb-xjc.jar
+		</tools>
+	</uses>
+    <main>
+        <classes>
+            icecube.daq.testFrame.DAQTestFrame
+        </classes>
+    </main>
+</project>
