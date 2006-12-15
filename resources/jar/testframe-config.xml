@@ -26,7 +26,7 @@
         <!-- the name for the output destintaion must be one of the following options: -->
         <!-- (globalTrigger, disposerOutputDest, fileWriterChannel)                    -->
         <!--  ======================================================================== -->
-        <dest>fileWriterChannel</dest>
+        <dest>globalTrigger</dest>
 
         <!--  ========================================= -->
         <!-- configure the trigger based on a xml file  -->
@@ -43,6 +43,47 @@
         <!--  =============================================================== -->
         <outputDests>outputDest-config.xml</outputDests>
     </iniceTrigger>
+
+    <!-- ======================= -->
+    <!-- Configure globalTrigger -->
+    <!-- ======================= -->
+    <globalTrigger>
+
+        <!--  ================================================================ -->
+        <!-- this option enable or disable the component. By default the       -->
+        <!-- component is active (true). The options are (true, false)         -->
+        <!--  ================================================================ -->
+        <active>true</active>
+
+        <!--  =================================================================== -->
+        <!-- the name for the input source must be one of the following options:  -->
+        <!-- (iniceTrigger, randGenerator, fileReader)                            -->
+        <!--  =================================================================== -->
+        <source>iniceTrigger</source>
+
+        <!--  ======================================================================== -->
+        <!-- the name for the output destintaion must be one of the following options: -->
+        <!-- (eventBuilder, disposerOutputDest, fileWriterChannel)                    -->
+        <!--  ======================================================================== -->
+        <dest>fileWriterChannel</dest>
+
+        <!--  ========================================= -->
+        <!-- configure the trigger based on a xml file  -->
+        <!--  ========================================= -->
+        <triggerConfig>globalTrigger-config.xml</triggerConfig>
+
+        <!--  ============================================================== -->
+        <!-- make up the input source from a generator or a input file -->
+        <!--  ============================================================== -->
+        <inputSource>inputSource-config.xml</inputSource>
+
+        <!--  =============================================================== -->
+        <!-- make up the output destination which can be a disposer or a file -->
+        <!--  =============================================================== -->
+        <outputDests>outputDest-config.xml</outputDests>
+
+    </globalTrigger>
+
 
 
     <!-- =========================== -->

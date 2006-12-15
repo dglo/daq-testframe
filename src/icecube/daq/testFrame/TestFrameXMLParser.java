@@ -37,6 +37,7 @@ import icecube.daq.trigger.control.ITriggerManager;
 import icecube.daq.trigger.control.ITriggerControl;
 import icecube.daq.trigger.config.TriggerBuilder;
 import icecube.daq.trigger.component.IniceTriggerComponent;
+import icecube.daq.trigger.component.GlobalTriggerComponent;
 
 /**
  * This class parses the xml configuration file for the test frame
@@ -124,6 +125,7 @@ public class TestFrameXMLParser implements TestFrameConstants {
     private Pipe.SourceChannel globalTriggerOutputSourceChannel;
     private Pipe.SinkChannel globalTriggerOutputSinkChannel;
     private int runNumber = 0;
+    private boolean isInIceActive = false;
 
     public TestFrameXMLParser(String configFile) throws Exception {
 
@@ -152,6 +154,7 @@ public class TestFrameXMLParser implements TestFrameConstants {
         initSecondaryBuilders();
         initEventBuilder();
         initIniceTrigger();
+        initGlobalTrigger();
     }
 
     public void initSecondaryBuilders() throws DAQCompException{
@@ -319,6 +322,7 @@ public class TestFrameXMLParser implements TestFrameConstants {
                     iniceTriggerOutputSourceChannel.configureBlocking(false);
                     iniceTriggerOutputSinkChannel = pipe.sink();
                     iniceTriggerOutputSinkChannel.configureBlocking(false);
+                    isInIceActive = true;
                 }catch(IOException ioe){
                     throw new RuntimeException(ioe);
                 }
@@ -366,8 +370,118 @@ public class TestFrameXMLParser implements TestFrameConstants {
             triggerComp.setOutputDestination(dests);
         } else {
             // tie the output channel to global trigger
-            addOutputChannel(iniceTriggerComp, DAQConnector.TYPE_TRIGGER, iniceTriggerOutputSinkChannel);
+            addOutputChannel(iniceTriggerComp, DAQConnector.TYPE_TRIGGER, iniceTriggerOutputSinkChannel,
+                    iniceTriggerComp.getSourceID());
         }
+        daqComponents.add(triggerComp);
+    }
+
+
+    private void initGlobalTrigger() throws DAQCompException {
+
+        Element globalTriggerElement = testFrameElement.element(GLOBAL_TRIGGER);
+        if (globalTriggerElement == null || !globalTriggerElement.hasContent()) {
+            return;
+        }
+
+        // check if the secondaryBuilders is active
+        Element activeElement = globalTriggerElement.element(ACTIVE);
+        if (activeElement != null) {
+            if (activeElement.getText().equalsIgnoreCase("false")) {
+                return;
+            }
+        } else {
+            return;
+        }
+
+        String source = RANDOM_GENERATOR;
+        Element sourceElement = globalTriggerElement.element(SOURCE);
+        InputSourceManager inputSourceManager = null;
+        if (sourceElement != null) {
+            source = sourceElement.getText();
+            if (source.equalsIgnoreCase(INICE_TRIGGER)) {
+                isInIceActive = true;
+            } else if (source.equalsIgnoreCase(RANDOM_GENERATOR)) {
+                Element inputElement = globalTriggerElement.element(INPUT_SOURCE);
+                try {
+                    inputSourceManager = new InputSourceGeneratorMng(InputSourceXMLParser.parseGenerator(inputElement.getText()));
+                } catch (Exception e){
+                    throw new RuntimeException(e);
+                }
+            } else if (source.equalsIgnoreCase(FILE_READER)) {
+                Element inputElement = globalTriggerElement.element(INPUT_SOURCE);
+                try {
+                    inputSourceManager = new FileInputSourceMng(InputSourceXMLParser.parseFileInput(inputElement.getText()));
+                } catch(Exception e){
+                    throw new RuntimeException(e);
+                }
+            } else {
+                throw new RuntimeException("invalid value for source element");
+            }
+        }
+
+        String dest = DISPOSER_OUTPUT_DEST;
+        Element destElement = globalTriggerElement.element(DEST);
+        OutputDestination[] dests = null;
+        if (destElement != null) {
+            dest = destElement.getText();
+            if (dest.equalsIgnoreCase(EVENT_BUILDER)) {
+                try {
+                    Pipe pipe = Pipe.open();
+                    globalTriggerOutputSourceChannel = pipe.source();
+                    globalTriggerOutputSourceChannel.configureBlocking(false);
+                    globalTriggerOutputSinkChannel = pipe.sink();
+                    globalTriggerOutputSinkChannel.configureBlocking(false);
+                } catch(Exception e){
+                    throw new RuntimeException(e);
+                }
+            } else if (dest.equalsIgnoreCase(DISPOSER_OUTPUT_DEST)) {
+                try {
+                    dests = OutputDestinationXMLParser.parseDisposerOutputDestination(globalTriggerElement.element(OUTPUT_DESTS).getText());
+                } catch (Exception e){
+                    throw new RuntimeException(e);
+                }
+            } else if (dest.equalsIgnoreCase(FILE_WRITER_CHANNEL)) {
+                try {
+                    dests = OutputDestinationXMLParser.parseFileOutput(globalTriggerElement.element(OUTPUT_DESTS).getText());
+                } catch(Exception e){
+                    throw new RuntimeException(e);
+                }
+            } else {
+                throw new RuntimeException("invalid value for dest element " + dest);
+            }
+        }
+
+        GlobalTriggerComponent globalTriggerComp = new GlobalTriggerComponent();
+        DAQTestComponent triggerComp = new DAQTestComponent(globalTriggerComp);
+        try {
+            parseTriggerBuilder(globalTriggerElement, globalTriggerComp.getTriggerManager());
+        } catch(Exception e){
+            throw new RuntimeException(e);
+        }
+
+        // add input channels from inice trigger
+        if (inputSourceManager != null) {
+            addInputChannels(globalTriggerComp, DAQConnector.TYPE_TRIGGER, inputSourceManager);
+            triggerComp.addInputSourceManager(inputSourceManager);
+        } else {
+            if (isInIceActive) {
+                addInputChannel(globalTriggerComp, DAQConnector.TYPE_TRIGGER, iniceTriggerOutputSourceChannel);
+            } else {
+                log.error("Config error: InIce input to GT is off!");
+            }
+        }
+
+        // add output channels
+        if (dests != null) {
+            addOutputChannels(globalTriggerComp, DAQConnector.TYPE_GLOBAL_TRIGGER, dests,
+                    globalTriggerComp.getSourceID());
+            triggerComp.setOutputDestination(dests);
+        } else {
+            addOutputChannel(globalTriggerComp, DAQConnector.TYPE_GLOBAL_TRIGGER, globalTriggerOutputSinkChannel,
+                    globalTriggerComp.getSourceID());
+        }
+
         daqComponents.add(triggerComp);
     }
 
@@ -614,11 +728,11 @@ public class TestFrameXMLParser implements TestFrameConstants {
                     daqComponent.getByteBufferCache(type));
         }
     }
-    
+
     private void addOutputChannels(DAQComponent daqComponent,
                                   String type,
                                   OutputDestination[] dests,
-                                  ISourceID sourceID) throws DAQCompException{
+                                  ISourceID sourceID){
 
         PayloadDestinationOutputEngine outputEngine =
                 (PayloadDestinationOutputEngine)daqComponent.getOutputEngine(type);
@@ -631,6 +745,13 @@ public class TestFrameXMLParser implements TestFrameConstants {
             throws DAQCompException{
         PayloadOutputEngine outputEngine = daqComponent.getOutputEngine(type);
         outputEngine.addDataChannel(sinkChannel, daqComponent.getByteBufferCache(type));
+    }
+    
+    private void addOutputChannel(DAQComponent daqComponent, String type, Pipe.SinkChannel sinkChannel,
+                                  ISourceID sourceID){
+        PayloadDestinationOutputEngine outputEngine =
+                (PayloadDestinationOutputEngine)daqComponent.getOutputEngine(type);
+        outputEngine.addDataChannel(sinkChannel, sourceID);
     }
 
 
