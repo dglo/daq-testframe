@@ -42,7 +42,8 @@ public class DAQTestComponent implements TestFrameConstants {
 
         if (!daqComponent.getName().equalsIgnoreCase(SECONDARY_BUILDERS) &&
                 !daqComponent.getName().equalsIgnoreCase(EVENT_BUILDER) &&
-                !daqComponent.getName().equalsIgnoreCase(INICE_TRIGGER)) {
+                !daqComponent.getName().equalsIgnoreCase(INICE_TRIGGER) &&
+                !daqComponent.getName().equalsIgnoreCase(GLOBAL_TRIGGER)) {
             throw new IllegalArgumentException(daqComponent.getName() +
                     " is not a valid component name.");
         }
@@ -155,7 +156,8 @@ public class DAQTestComponent implements TestFrameConstants {
             System.out.println((ByteBufferCache)bufferCaches.get(i));
             System.out.println("=============================== ");
         }
-        if (daqComponent.getName().equalsIgnoreCase(INICE_TRIGGER)) {
+        if (daqComponent.getName().equalsIgnoreCase(INICE_TRIGGER) ||
+                daqComponent.getName().equalsIgnoreCase(GLOBAL_TRIGGER)) {
             try {
                 bufferCache = daqComponent.getByteBufferCache("");
             }catch(DAQCompException e){

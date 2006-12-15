@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<activeTriggers>
+    <triggerConfig>
+        <triggerType>3</triggerType>
+        <triggerConfigId>0</triggerConfigId>
+        <sourceId>6000</sourceId>
+        <triggerName>ThroughputTrigger</triggerName>
+    </triggerConfig>
+</activeTriggers>
