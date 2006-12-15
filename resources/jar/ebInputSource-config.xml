@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<inputSources>
+    <!-- ============================================================= -->
+    <!-- configure input sources for eventBuilder                      -->
+    <!-- ============================================================= -->
+    <inputSourceGenerator>
+        <numEventGen>1000</numEventGen>
+        <randSeed>0</randSeed>
+    </inputSourceGenerator>
+
+    <inputSourceFile>
+        <sourceId>5000</sourceId>
+        <fileName>testMain.timeCal</fileName>
+    </inputSourceFile>
+    <inputSourceFile>
+        <sourceId>2000</sourceId>
+        <fileName>stringProc-output.dat</fileName>
+    </inputSourceFile>
+</inputSources>
