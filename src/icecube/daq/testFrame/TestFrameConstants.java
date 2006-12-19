@@ -82,5 +82,7 @@ public interface TestFrameConstants {
     public static final String IS_SN_ENABLED = "isSnEnabled";
     public static final String IS_MONI_ENABLED = "isMoniEnabled";
     public static final String RUN_NUMBER = "runNumber";
+    public static final String SIMULATOR = "simulator";
+    public static final String SH_SIM_CONFIG = "shSimConfig";
 
 }

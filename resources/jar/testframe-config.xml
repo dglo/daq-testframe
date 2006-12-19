@@ -6,6 +6,52 @@
     <!-- =========================== -->
     <runNumber>12345</runNumber>
 
+    <!-- ========================= -->
+    <!-- Configure StringHubs      -->
+    <!-- ========================= -->
+    <stringHubs>
+        <stringHub>
+            <!--  ================================================================ -->
+            <!-- this option enable or disable the component. By default the       -->
+            <!-- component is active (true). The options are (true, false)         -->
+            <!--  ================================================================ -->
+            <active>true</active>
+
+            <!--  =================================== -->
+            <!-- sourceID                             -->
+            <!--  =================================== -->
+            <sourceID>1001</sourceID>
+
+            <!--  ============================================================================ -->
+            <!-- the name for the hit data input source must be one of the following options:  -->
+            <!-- (simulator)                                                                  -->
+            <!--  ============================================================================ -->
+            <inputSource>simulator</inputSource>
+
+            <!--  ============================================================= -->
+            <!-- make up the data input source from a generator or a input file -->
+            <!--  ============================================================= -->
+            <simConfig>./config/hub1001sim.xml</simConfig>
+
+            <!--  ============================================================= -->
+            <!-- StringHub sim config                                           -->
+            <!--  ============================================================= -->
+            <shSimConfig>./config/stringHubSimConfig.xml</shSimConfig>
+
+            <!--  ======================================================================== -->
+            <!-- the name for the iniceTrig destination must be one of the following options: -->
+            <!-- (iniceTrigger, disposerOutputDest, fileWriterChannel)                     -->
+            <!--  ======================================================================== -->
+            <hitDataDest>iniceTrigger</hitDataDest>
+
+            <!--  ======================================================================== -->
+            <!-- the name for the eventBuilder destination must be one of the following options: -->
+            <!-- (eventBuilder, disposerOutputDest, fileWriterChannel)                     -->
+            <!--  ======================================================================== -->
+            <ebDataDest>eventBuilder</ebDataDest>
+        </stringHub>
+    </stringHubs>
+
     <!-- =========================== -->
     <!-- Configure inice trigger     -->
     <!-- =========================== -->
