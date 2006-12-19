@@ -18,6 +18,7 @@ import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Properties;
 import java.net.URL;
 import java.nio.channels.Pipe;
 import java.nio.channels.ReadableByteChannel;
@@ -38,6 +39,7 @@ import icecube.daq.trigger.control.ITriggerControl;
 import icecube.daq.trigger.config.TriggerBuilder;
 import icecube.daq.trigger.component.IniceTriggerComponent;
 import icecube.daq.trigger.component.GlobalTriggerComponent;
+import icecube.daq.stringhub.StringHubComponent;
 
 /**
  * This class parses the xml configuration file for the test frame
@@ -155,9 +157,10 @@ public class TestFrameXMLParser implements TestFrameConstants {
         initEventBuilder();
         initIniceTrigger();
         initGlobalTrigger();
+        initStringHubs();
     }
 
-    public void initSecondaryBuilders() throws DAQCompException{
+    public void initSecondaryBuilders() throws DAQCompException {
         Element sbElement = testFrameElement.element(SECONDARY_BUILDERS);
         if (sbElement == null || !sbElement.hasContent()) {
             return;
@@ -197,7 +200,7 @@ public class TestFrameXMLParser implements TestFrameConstants {
         Element isTcalElement = sbElement.element(IS_TCAL_ENABLED);
         if (isTcalElement != null) {
             isTcalEnabled = Boolean.parseBoolean(isTcalElement.getText());
-            if (isTcalEnabled){
+            if (isTcalEnabled) {
                 ++secBuilderCounter;
             }
         }
@@ -206,7 +209,7 @@ public class TestFrameXMLParser implements TestFrameConstants {
         Element isSnElement = sbElement.element(IS_SN_ENABLED);
         if (isSnElement != null) {
             isSnEnabled = Boolean.parseBoolean(isSnElement.getText());
-            if (isSnEnabled){
+            if (isSnEnabled) {
                 ++secBuilderCounter;
             }
         }
@@ -215,7 +218,7 @@ public class TestFrameXMLParser implements TestFrameConstants {
         Element isMoniElement = sbElement.element(IS_MONI_ENABLED);
         if (isMoniElement != null) {
             isMoniEnabled = Boolean.parseBoolean(isMoniElement.getText());
-            if (isMoniEnabled){
+            if (isMoniEnabled) {
                 ++secBuilderCounter;
             }
         }
@@ -232,7 +235,7 @@ public class TestFrameXMLParser implements TestFrameConstants {
             if (source.equalsIgnoreCase(RANDOM_GENERATOR)) {
                 Element inputElement = sbElement.element(INPUT_SOURCE);
                 try {
-                    for (int i = 0; i < secBuilderCounter; i++){
+                    for (int i = 0; i < secBuilderCounter; i++) {
                         inputSourceManagers.add(new InputSourceGeneratorMng
                                 (InputSourceXMLParser.parseGenerator(inputElement.getText())));
                     }
@@ -246,24 +249,75 @@ public class TestFrameXMLParser implements TestFrameConstants {
         // make up input channels
         DAQTestComponent secBuilder = new DAQTestComponent(sbComponent);
         if (inputSourceManagers.size() > 0) {
-            if (isTcalEnabled){
-                InputSourceManager inputSourceMng = (InputSourceManager)inputSourceManagers.remove(0);
+            if (isTcalEnabled) {
+                InputSourceManager inputSourceMng = (InputSourceManager) inputSourceManagers.remove(0);
                 secBuilder.addInputSourceManager(inputSourceMng);
                 addInputChannels(sbComponent, DAQConnector.TYPE_TCAL_DATA, inputSourceMng);
             }
-            if (isSnEnabled){
-                InputSourceManager inputSourceMng = (InputSourceManager)inputSourceManagers.remove(0);
+            if (isSnEnabled) {
+                InputSourceManager inputSourceMng = (InputSourceManager) inputSourceManagers.remove(0);
                 secBuilder.addInputSourceManager(inputSourceMng);
                 addInputChannels(sbComponent, DAQConnector.TYPE_SN_DATA, inputSourceMng);
             }
-            if (isMoniEnabled){
-                InputSourceManager inputSourceMng = (InputSourceManager)inputSourceManagers.remove(0);
+            if (isMoniEnabled) {
+                InputSourceManager inputSourceMng = (InputSourceManager) inputSourceManagers.remove(0);
                 secBuilder.addInputSourceManager(inputSourceMng);
                 addInputChannels(sbComponent, DAQConnector.TYPE_MONI_DATA, inputSourceMng);
             }
         }
 
         daqComponents.add(secBuilder);
+    }
+
+    private void initStringHubs() throws Exception {
+
+        Properties properties = new Properties(System.getProperties());
+
+        Element stringHubsElement = testFrameElement.element(STRING_HUBS);
+        if (stringHubsElement == null || !stringHubsElement.hasContent()) {
+            return;
+        }
+
+        Iterator stringHubItr = stringHubsElement.elementIterator();
+
+        while (stringHubItr.hasNext()) {
+            Element shElement = (Element) stringHubItr.next();
+            Element activeElement = shElement.element(ACTIVE);
+            if (activeElement != null) {
+                if (activeElement.getText().equalsIgnoreCase("false")) {
+                    return;
+                }
+            }
+
+            Element sourceIDElement = shElement.element(SOURCE_ID);
+            if (sourceIDElement != null) {
+                properties.setProperty("icecube.daq.stringhub.componentId", sourceIDElement.getText());
+            }
+
+            Element inputSourceElement = shElement.element(INPUT_SOURCE);
+            String simulator = "false";
+            if (inputSourceElement != null) {
+                if (inputSourceElement.getText().equals(SIMULATOR)){
+                    simulator = "true";
+                }
+            }
+            properties.setProperty("icecube.daq.stringhub.simulation", simulator);
+
+            Element shSimConfigElement = shElement.element(SH_SIM_CONFIG);
+            String shSimConfigFileName = "null";
+            if (shSimConfigElement != null){
+                shSimConfigFileName = shSimConfigElement.getText();
+            }
+            properties.setProperty("icecube.daq.stringhub.simulation.config", shSimConfigFileName);
+
+            // TODO: fix this later
+            properties.setProperty("icecube.daq.stringhub.configPath", "./config");
+
+            System.setProperties(properties);
+
+            StringHubComponent shComp = new StringHubComponent(Integer.getInteger("icecube.daq.stringhub.componentId"));
+        }
+
     }
 
     private void initIniceTrigger() throws DAQCompException {
@@ -295,14 +349,14 @@ public class TestFrameXMLParser implements TestFrameConstants {
                 Element inputElement = iniceTriggerElement.element(INPUT_SOURCE);
                 try {
                     inputSourceManager = new InputSourceGeneratorMng(InputSourceXMLParser.parseGenerator(inputElement.getText()));
-                } catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else if (source.equalsIgnoreCase(FILE_READER)) {
                 Element inputElement = iniceTriggerElement.element(INPUT_SOURCE);
                 try {
                     inputSourceManager = new FileInputSourceMng(InputSourceXMLParser.parseFileInput(inputElement.getText()));
-                }catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else {
@@ -323,21 +377,21 @@ public class TestFrameXMLParser implements TestFrameConstants {
                     iniceTriggerOutputSinkChannel = pipe.sink();
                     iniceTriggerOutputSinkChannel.configureBlocking(false);
                     isInIceActive = true;
-                }catch(IOException ioe){
+                } catch (IOException ioe) {
                     throw new RuntimeException(ioe);
                 }
             } else if (dest.equalsIgnoreCase(DISPOSER_OUTPUT_DEST)) {
                 Element outputElement = iniceTriggerElement.element(OUTPUT_DESTS);
                 try {
                     dests = OutputDestinationXMLParser.parseDisposerOutputDestination(outputElement.getText());
-                } catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else if (dest.equalsIgnoreCase(FILE_WRITER_CHANNEL)) {
                 Element outputElement = iniceTriggerElement.element(OUTPUT_DESTS);
                 try {
                     dests = OutputDestinationXMLParser.parseFileOutput(outputElement.getText());
-                } catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else {
@@ -349,7 +403,7 @@ public class TestFrameXMLParser implements TestFrameConstants {
         DAQTestComponent triggerComp = new DAQTestComponent(iniceTriggerComp);
         try {
             parseTriggerBuilder(iniceTriggerElement, iniceTriggerComp.getTriggerManager());
-        } catch(Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
@@ -405,14 +459,14 @@ public class TestFrameXMLParser implements TestFrameConstants {
                 Element inputElement = globalTriggerElement.element(INPUT_SOURCE);
                 try {
                     inputSourceManager = new InputSourceGeneratorMng(InputSourceXMLParser.parseGenerator(inputElement.getText()));
-                } catch (Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else if (source.equalsIgnoreCase(FILE_READER)) {
                 Element inputElement = globalTriggerElement.element(INPUT_SOURCE);
                 try {
                     inputSourceManager = new FileInputSourceMng(InputSourceXMLParser.parseFileInput(inputElement.getText()));
-                } catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else {
@@ -432,19 +486,19 @@ public class TestFrameXMLParser implements TestFrameConstants {
                     globalTriggerOutputSourceChannel.configureBlocking(false);
                     globalTriggerOutputSinkChannel = pipe.sink();
                     globalTriggerOutputSinkChannel.configureBlocking(false);
-                } catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else if (dest.equalsIgnoreCase(DISPOSER_OUTPUT_DEST)) {
                 try {
                     dests = OutputDestinationXMLParser.parseDisposerOutputDestination(globalTriggerElement.element(OUTPUT_DESTS).getText());
-                } catch (Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else if (dest.equalsIgnoreCase(FILE_WRITER_CHANNEL)) {
                 try {
                     dests = OutputDestinationXMLParser.parseFileOutput(globalTriggerElement.element(OUTPUT_DESTS).getText());
-                } catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else {
@@ -456,7 +510,7 @@ public class TestFrameXMLParser implements TestFrameConstants {
         DAQTestComponent triggerComp = new DAQTestComponent(globalTriggerComp);
         try {
             parseTriggerBuilder(globalTriggerElement, globalTriggerComp.getTriggerManager());
-        } catch(Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
@@ -609,14 +663,14 @@ public class TestFrameXMLParser implements TestFrameConstants {
                 Element outputElement = ebElement.element(EB_REQ_OUTPUT_DEST);
                 try {
                     reqDests = OutputDestinationXMLParser.parseDisposerOutputDestination(outputElement.getText());
-                } catch (Exception ioe){
+                } catch (Exception ioe) {
                     throw new RuntimeException(ioe);
                 }
             } else if (ebReqOutputDest.equalsIgnoreCase(FILE_WRITER_CHANNEL)) {
                 Element outputElement = ebElement.element(EB_REQ_OUTPUT_DEST);
                 try {
                     reqDests = OutputDestinationXMLParser.parseFileOutput(outputElement.getText());
-                } catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else {
@@ -636,14 +690,14 @@ public class TestFrameXMLParser implements TestFrameConstants {
                 Element outputElement = ebElement.element(EB_FLUSH_OUTPUT_DEST);
                 try {
                     flushDests = OutputDestinationXMLParser.parseDisposerOutputDestination(outputElement.getText());
-                } catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else if (ebFlushOutputDest.equalsIgnoreCase(FILE_WRITER_CHANNEL)) {
                 Element outputElement = ebElement.element(EB_FLUSH_OUTPUT_DEST);
                 try {
                     flushDests = OutputDestinationXMLParser.parseFileOutput(outputElement.getText());
-                } catch(Exception e){
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else {
@@ -702,7 +756,7 @@ public class TestFrameXMLParser implements TestFrameConstants {
     // add inputChannels
     private void addInputChannels(DAQComponent daqComponent,
                                   String type,
-                                  InputSourceManager inputSourceManager) throws DAQCompException{
+                                  InputSourceManager inputSourceManager) throws DAQCompException {
 
         PayloadInputEngine inputEngine = daqComponent.getInputEngine(type);
         InputSource[] inputSources = inputSourceManager.getInputSources();
@@ -713,44 +767,44 @@ public class TestFrameXMLParser implements TestFrameConstants {
     }
 
     private void addInputChannel(DAQComponent daqComponent, String type, Pipe.SourceChannel sourceChannel)
-            throws DAQCompException{
+            throws DAQCompException {
         PayloadInputEngine inputEngine = daqComponent.getInputEngine(type);
         inputEngine.addDataChannel(sourceChannel, daqComponent.getByteBufferCache(type));
     }
 
     private void addOutputChannels(DAQComponent daqComponent,
-                                  String type,
-                                  OutputDestination[] dests) throws DAQCompException{
+                                   String type,
+                                   OutputDestination[] dests) throws DAQCompException {
 
         PayloadOutputEngine outputEngine = daqComponent.getOutputEngine(type);
         for (int i = 0; i < dests.length; i++) {
-            outputEngine.addDataChannel(((WritableByteChannel)dests[i].getSinkChannel()),
+            outputEngine.addDataChannel(((WritableByteChannel) dests[i].getSinkChannel()),
                     daqComponent.getByteBufferCache(type));
         }
     }
 
     private void addOutputChannels(DAQComponent daqComponent,
-                                  String type,
-                                  OutputDestination[] dests,
-                                  ISourceID sourceID){
+                                   String type,
+                                   OutputDestination[] dests,
+                                   ISourceID sourceID) {
 
         PayloadDestinationOutputEngine outputEngine =
-                (PayloadDestinationOutputEngine)daqComponent.getOutputEngine(type);
+                (PayloadDestinationOutputEngine) daqComponent.getOutputEngine(type);
         for (int i = 0; i < dests.length; i++) {
-            outputEngine.addDataChannel(((WritableByteChannel)dests[i].getSinkChannel()), sourceID);
+            outputEngine.addDataChannel(((WritableByteChannel) dests[i].getSinkChannel()), sourceID);
         }
     }
 
     private void addOutputChannel(DAQComponent daqComponent, String type, Pipe.SinkChannel sinkChannel)
-            throws DAQCompException{
+            throws DAQCompException {
         PayloadOutputEngine outputEngine = daqComponent.getOutputEngine(type);
         outputEngine.addDataChannel(sinkChannel, daqComponent.getByteBufferCache(type));
     }
-    
+
     private void addOutputChannel(DAQComponent daqComponent, String type, Pipe.SinkChannel sinkChannel,
-                                  ISourceID sourceID){
+                                  ISourceID sourceID) {
         PayloadDestinationOutputEngine outputEngine =
-                (PayloadDestinationOutputEngine)daqComponent.getOutputEngine(type);
+                (PayloadDestinationOutputEngine) daqComponent.getOutputEngine(type);
         outputEngine.addDataChannel(sinkChannel, sourceID);
     }
 
