@@ -6,11 +6,6 @@
  */
 package icecube.daq.testFrame;
 
-import icecube.daq.io.DAQComponentOutputProcess;
-import icecube.daq.common.DAQComponentInputProcess;
-import icecube.daq.splicer.Splicer;
-import icecube.daq.testUtil.OutputDestination;
-import icecube.daq.testUtil.InputSourceManager;
 import icecube.icebucket.logging.LoggingConsumer;
 
 import java.io.IOException;

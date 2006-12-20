@@ -25,6 +25,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 
 import icecube.daq.payload.*;
+import icecube.daq.payload.impl.SourceID4B;
 import icecube.daq.common.*;
 import icecube.daq.io.*;
 import icecube.daq.testUtil.*;
@@ -316,8 +317,70 @@ public class TestFrameXMLParser implements TestFrameConstants {
             System.setProperties(properties);
 
             StringHubComponent shComp = new StringHubComponent(Integer.getInteger("icecube.daq.stringhub.componentId"));
-        }
+            shComp.setGlobalConfigurationDir("./config");
 
+            Element ebReqSourceElement = shElement.element(EB_REQ_DATA_SOURCE);
+            Pipe.SinkChannel ebReqSinkChannel = null;
+            Pipe.SourceChannel ebReqSourceChannel = null;
+            if (ebReqSourceElement != null) {
+                if (ebReqSourceElement.getText().equalsIgnoreCase(EB_REQ_DATA_SOURCE)) {
+                    // create and add to the list sink/source channels that feed EB req engine
+                    Pipe pipe = Pipe.open();
+                    ebReqSinkChannel = pipe.sink();
+                    ebReqSinkChannel.configureBlocking(false);
+                    ebReqOutputToSPSinkChannels.add(ebReqSinkChannel);
+                    ebReqSourceChannel = pipe.source();
+                    ebReqSourceChannel.configureBlocking(false);
+                    ebReqOutputToSPSourceChannels.add(ebReqSourceChannel);
+                }
+            }
+
+            if (ebReqSinkChannel != null && ebReqSourceChannel != null) {
+                addInputChannel(shComp, DAQConnector.TYPE_READOUT_REQUEST, ebReqSourceChannel);
+            }
+
+            Element ebDestElement = shElement.element(EB_DATA_DEST);
+            Pipe.SourceChannel ebOutputSourceChannel = null;
+            Pipe.SinkChannel ebOutputSinkChannel = null;
+            if (ebDestElement != null){
+                if (ebDestElement.getText().equalsIgnoreCase(EVENT_BUILDER)) {
+                    Pipe pipe = Pipe.open();
+                    ebOutputSourceChannel = pipe.source();
+                    ebOutputSourceChannel.configureBlocking(false);
+                    ebOutputSinkChannel = pipe.sink();
+                    ebOutputSinkChannel.configureBlocking(false);
+                    ebOutputSourceChannels.add(ebOutputSourceChannel);
+                    ebOutputSinkChannels.add(ebOutputSinkChannel);
+                }
+            }
+
+            if (ebOutputSinkChannel != null && ebOutputSourceChannel != null){
+                addOutputChannel(shComp, DAQConnector.TYPE_READOUT_DATA, ebOutputSinkChannel,
+                    new SourceID4B(shComp.getId()));
+            }
+
+            Element hitdataDestElement = shElement.element(HIT_DATA_DEST);
+            Pipe.SinkChannel spDataOutputSinkChannel = null;
+            Pipe.SourceChannel spDataOutputSourceChannel = null;
+            if (hitdataDestElement != null) {
+                if (hitdataDestElement.getText().equalsIgnoreCase(INICE_TRIGGER)) {
+                    // create and add to the list sink/source channels that feed iniceTrigger
+                    Pipe pipe = Pipe.open();
+                    spDataOutputSinkChannel = pipe.sink();
+                    spDataOutputSinkChannel.configureBlocking(false);
+                    spOutputToIniceSinkChannels.add(spDataOutputSinkChannel);
+                    spDataOutputSourceChannel = pipe.source();
+                    spDataOutputSourceChannel.configureBlocking(false);
+                    spOutputToIniceSourceChannels.add(spDataOutputSourceChannel);
+                }
+            }
+            if (spDataOutputSinkChannel != null && spDataOutputSourceChannel != null){
+                addOutputChannel(shComp, DAQConnector.TYPE_STRING_HIT, spDataOutputSinkChannel,
+                    new SourceID4B(shComp.getId()));
+            }
+
+            shComp.configuring("hub1001sim");
+        }
     }
 
     private void initIniceTrigger() throws DAQCompException {

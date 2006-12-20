@@ -44,6 +44,12 @@
             <!--  ======================================================================== -->
             <hitDataDest>iniceTrigger</hitDataDest>
 
+            <!--  ============================================================================ -->
+            <!-- the name for the hit data input source must be one of the following options:  -->
+            <!-- (ebReqDataSource)                                                             -->
+            <!--  ============================================================================ -->
+            <ebReqDataSource>ebReqDataSource</ebReqDataSource>
+
             <!--  ======================================================================== -->
             <!-- the name for the eventBuilder destination must be one of the following options: -->
             <!-- (eventBuilder, disposerOutputDest, fileWriterChannel)                     -->
