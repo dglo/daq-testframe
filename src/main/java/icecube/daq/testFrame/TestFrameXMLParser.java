@@ -225,7 +225,7 @@ public class TestFrameXMLParser implements TestFrameConstants {
         }
 
         SBComponent sbComponent = new SBComponent(new SecBuilderCompConfig(granularity, maxCachedBytes, maxNumAcquiredBytes,
-                isTcalEnabled, isSnEnabled, isMoniEnabled));
+                isTcalEnabled, isSnEnabled, isMoniEnabled, false));
         sbComponent.setRunNumber(runNumber);
 
         // configure input source
