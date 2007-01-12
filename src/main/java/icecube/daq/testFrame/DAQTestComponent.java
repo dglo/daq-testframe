@@ -101,7 +101,7 @@ public class DAQTestComponent implements TestFrameConstants {
             }
         }
         daqComponent.connect();
-        daqComponent.configure();
+        daqComponent.configuring("testing");
         daqComponent.start();
         daqComponent.startEngines();
         startInputMngProcessing();
@@ -129,7 +129,7 @@ public class DAQTestComponent implements TestFrameConstants {
             try {
                 bufferCache = daqComponent.getByteBufferCache(DAQConnector.TYPE_TCAL_DATA);
             }catch(DAQCompException e){
-                log.info(e);
+                log.error(e);
             }
             if (bufferCache != null){
                 bufferCaches.add(bufferCache);
@@ -137,7 +137,7 @@ public class DAQTestComponent implements TestFrameConstants {
             try {
                 bufferCache = daqComponent.getByteBufferCache(DAQConnector.TYPE_SN_DATA);
             } catch(DAQCompException e){
-                log.info(e);
+                log.error(e);
             }
             if (bufferCache != null){
                 bufferCaches.add(bufferCache);
@@ -145,7 +145,7 @@ public class DAQTestComponent implements TestFrameConstants {
             try {
                 bufferCache = daqComponent.getByteBufferCache(DAQConnector.TYPE_MONI_DATA);
             } catch(DAQCompException e){
-                log.info(e);
+                log.error(e);
             }
             if (bufferCache != null){
                 bufferCaches.add(bufferCache);

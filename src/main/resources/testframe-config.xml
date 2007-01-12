@@ -15,7 +15,7 @@
             <!-- this option enable or disable the component. By default the       -->
             <!-- component is active (true). The options are (true, false)         -->
             <!--  ================================================================ -->
-            <active>true</active>
+            <active>false</active>
 
             <!--  =================================== -->
             <!-- sourceID                             -->
@@ -147,7 +147,7 @@
         <!--  this option enable or disable the component. By default the       -->
         <!--  component is active (true). The options are (true, false)         -->
         <!--  ================================================================ -->
-        <active>false</active>
+        <active>true</active>
 
         <!--  ================================================================ -->
         <!-- set the values for ByteBufferCache:                               -->
@@ -238,7 +238,6 @@
         <!-- make up the flush output destination                      -->
         <!--  ======================================================== -->
         <flushOutputDest>ebFlushOutputDest-config.xml</flushOutputDest>
-
 
     </eventBuilder>
 
