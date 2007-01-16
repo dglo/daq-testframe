@@ -151,11 +151,7 @@ public class DAQTestComponent implements TestFrameConstants {
                 bufferCaches.add(bufferCache);
             }
         }
-        for (int i = 0; i < bufferCaches.size(); i++){
-            System.out.println("======== " + daqComponent.getName() + " ======== ");
-            System.out.println((ByteBufferCache)bufferCaches.get(i));
-            System.out.println("=============================== ");
-        }
+
         if (daqComponent.getName().equalsIgnoreCase(INICE_TRIGGER) ||
                 daqComponent.getName().equalsIgnoreCase(GLOBAL_TRIGGER)) {
             try {
