@@ -17,9 +17,9 @@
             <!--  ================================================================ -->
             <active>false</active>
 
-            <!--  =================================== -->
-            <!-- sourceID                             -->
-            <!--  =================================== -->
+            <!-- =================================== -->
+            <!-- sourceID                            -->
+            <!-- =================================== -->
             <sourceID>1001</sourceID>
 
             <!--  ============================================================================ -->
@@ -72,7 +72,7 @@
         <!-- the name for the input source must be one of the following options:  -->
         <!-- (stringHub, randGenerator, fileReader)                              -->
         <!--  =================================================================== -->
-        <source>randGenerator</source>
+        <source>stringHub</source>
 
         <!--  ======================================================================== -->
         <!-- the name for the output destintaion must be one of the following options: -->
@@ -117,7 +117,7 @@
         <!-- the name for the output destintaion must be one of the following options: -->
         <!-- (eventBuilder, disposerOutputDest, fileWriterChannel)                    -->
         <!--  ======================================================================== -->
-        <dest>fileWriterChannel</dest>
+        <dest>eventBuilder</dest>
 
         <!--  ========================================= -->
         <!-- configure the trigger based on a xml file  -->
@@ -204,13 +204,13 @@
         <!-- the name for the input source must be one of the following options:  -->
         <!-- (globalTrigger, randGenerator, fileReader)                           -->
         <!--  =================================================================== -->
-        <frontEnd>randGenerator</frontEnd>
+        <frontEnd>globalTrigger</frontEnd>
 
         <!--  =========================================================================================== -->
         <!-- the name for the input source must be one of the following options:                          -->
         <!-- (stringHubs, fileReader, randGenerator)                                                      -->
         <!--  =========================================================================================== -->
-        <backEnd>randGenerator</backEnd>
+        <backEnd>stringHubs</backEnd>
 
         <!--  ======================================================== -->
         <!-- make up the input source from a generator or a input file -->
@@ -232,7 +232,7 @@
         <!-- the name for the flush output engine must be one of the following options: -->
         <!-- (stringHubs, disposerOutputDest, fileWriterChannel)                        -->
         <!--  ========================================================================= -->
-        <flushOutputEng>fileWriterChannel</flushOutputEng>
+        <flushOutputEng>stringHubs</flushOutputEng>
 
         <!--  ======================================================== -->
         <!-- make up the flush output destination                      -->

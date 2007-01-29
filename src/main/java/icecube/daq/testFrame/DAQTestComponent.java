@@ -101,7 +101,12 @@ public class DAQTestComponent implements TestFrameConstants {
             }
         }
         daqComponent.connect();
-        daqComponent.configuring("testing");
+        // TODO: this is temp
+        if (daqComponent.getName().equalsIgnoreCase(SECONDARY_BUILDERS)){
+            daqComponent.configuring("testing");
+        } else {
+            //
+        }
         daqComponent.start();
         daqComponent.startEngines();
         startInputMngProcessing();

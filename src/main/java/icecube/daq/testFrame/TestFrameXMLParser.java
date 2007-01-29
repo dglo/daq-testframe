@@ -154,11 +154,11 @@ public class TestFrameXMLParser implements TestFrameConstants {
     }
 
     public void parse() throws Exception {
+        initStringHubs();
         initSecondaryBuilders();
-        initEventBuilder();
         initIniceTrigger();
         initGlobalTrigger();
-        initStringHubs();
+        initEventBuilder();
     }
 
     public void initSecondaryBuilders() throws DAQCompException {
@@ -549,6 +549,7 @@ public class TestFrameXMLParser implements TestFrameConstants {
                     globalTriggerOutputSourceChannel.configureBlocking(false);
                     globalTriggerOutputSinkChannel = pipe.sink();
                     globalTriggerOutputSinkChannel.configureBlocking(false);
+                    log.info("connecting GlobalTrigger -> EventBuilder.....");
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -694,6 +695,7 @@ public class TestFrameXMLParser implements TestFrameConstants {
             addInputChannels(ebComp, DAQConnector.TYPE_GLOBAL_TRIGGER, gtInputSourceManager);
         } else if (isGlobalTrigger) {
             addInputChannel(ebComp, DAQConnector.TYPE_GLOBAL_TRIGGER, globalTriggerOutputSourceChannel);
+            log.info("Connecting EventBuilder -> GlobalTrigger.....");
         } else {
             throw new UnsupportedOperationException("Unknown configuration");
         }
