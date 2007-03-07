@@ -224,13 +224,8 @@ public class TestFrameXMLParser implements TestFrameConstants {
             }
         }
 
-        SBComponent sbComponent;
-        // JEJ removed - no longer throws IOException try {
-        sbComponent = new SBComponent(new SecBuilderCompConfig(granularity, maxCachedBytes, maxNumAcquiredBytes,
+        SBComponent sbComponent = new SBComponent(new SecBuilderCompConfig(granularity, maxCachedBytes, maxNumAcquiredBytes,
                 isTcalEnabled, isSnEnabled, isMoniEnabled, false));
-        // } catch (IOException ioe) {
-        //    throw new DAQCompException("Couldn't create SBComponent", ioe);
-        // } 
         sbComponent.setRunNumber(runNumber);
 
         // configure input source
